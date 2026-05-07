@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-card">
+    <div class="hero-badge">AxlePrice • AI valuation demo</div>
+    <h1 class="hero-title">AxlePrice: instant used-car valuation</h1>
+    <p class="hero-subtitle">
+      Get an instant price estimate locally, and optionally generate a short explanation via Hugging Face.
+    </p>
+
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="/valuation">Start valuation</a>
+      <a class="btn btn-ghost" href="/about">Learn more</a>
+    </div>
+
+    <div class="hero-meta">
+      <div class="meta-item">
+        <div class="meta-k">Local prediction</div>
+        <div class="meta-v">CPU • cached model</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-k">Optional explanation</div>
+        <div class="meta-v">HF Inference API</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-k">Simple inputs</div>
+        <div class="meta-v">brand • year • mileage</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="grid-3">
+  <div class="card">
+    <h2 class="card-title">What you’ll enter</h2>
+    <p class="card-body">Basic vehicle details: make/model, year, mileage, engine size, fuel, transmission.</p>
+  </div>
+  <div class="card">
+    <h2 class="card-title">What you’ll get</h2>
+    <p class="card-body">A predicted price in GBP, plus an optional short explanation in bullet points.</p>
+  </div>
+  <div class="card">
+    <h2 class="card-title">Privacy</h2>
+    <p class="card-body">Price prediction runs locally. Only the optional explanation makes a server request.</p>
+  </div>
+</section>
+{% endblock %}

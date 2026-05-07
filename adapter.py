@@ -20,9 +20,11 @@ from huggingface_hub import hf_hub_download
 # Default artefact filenames (must match what train.py uploads)
 # ---------------------------------------------------------------------------
 
-MODEL_FILENAME = "car_price_model.keras"
-SCALER_FILENAME = "scaler.joblib"
-CONFIG_FILENAME = "model_config.json"
+MODEL_FILENAME        = "car_price_model.keras"
+SCALER_FILENAME       = "scaler.joblib"
+CONFIG_FILENAME       = "model_config.json"
+NUMERIC_IDX_FILENAME  = "numeric_idx.joblib"
+MODEL_ENCODER_FILENAME = "model_encoder.joblib"
 
 
 # ---------------------------------------------------------------------------
@@ -54,6 +56,12 @@ def load_model_from_hf(
         The fitted StandardScaler used during training.
     feature_columns : list[str]
         Ordered list of feature column names expected by the model.
+    numeric_idx : list[int]
+        Indices of numeric columns that should be scaled.
+    model_encoder : dict
+        Smoothed target-encoding map for the 'model' column.
+    reference_year : int
+        Reference year used to compute car_age during training.
     """
     # Download each artefact (small files, cached after first call) ----------
     model_path = hf_hub_download(
@@ -75,17 +83,32 @@ def load_model_from_hf(
         token=token,
     )
 
-    # Load objects (lazy-import tensorflow so it's only pulled in when needed)
+    numeric_idx_path = hf_hub_download(
+        repo_id=repo_id,
+        filename=NUMERIC_IDX_FILENAME,
+        cache_dir=cache_dir,
+        token=token,
+    )
+    model_encoder_path = hf_hub_download(
+        repo_id=repo_id,
+        filename=MODEL_ENCODER_FILENAME,
+        cache_dir=cache_dir,
+        token=token,
+    )
+
     from tensorflow import keras
     model = keras.models.load_model(model_path)
 
-    scaler = joblib.load(scaler_path)
+    scaler        = joblib.load(scaler_path)
+    numeric_idx   = joblib.load(numeric_idx_path)
+    model_encoder = joblib.load(model_encoder_path)
 
     with open(config_path, "r") as f:
         config = json.load(f)
     feature_columns = config["feature_columns"]
+    reference_year  = config.get("reference_year", 2020)
 
     print(f"[adapter] Loaded model, scaler, and config from '{repo_id}'")
-    print(f"[adapter] Feature count: {len(feature_columns)}")
+    print(f"[adapter] Feature count: {len(feature_columns)}, numeric_idx: {numeric_idx}")
 
-    return model, scaler, feature_columns
+    return model, scaler, feature_columns, numeric_idx, model_encoder, reference_year

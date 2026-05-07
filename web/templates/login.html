@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-head">
+  <h1 class="page-title">Login</h1>
+  <p class="page-subtitle">Demo login for interview use.</p>
+</section>
+
+<section class="layout-two">
+  <div class="card">
+    <h2 class="card-title">Access AxlePrice</h2>
+    <form id="login-form" class="form" novalidate>
+      <div class="form-grid">
+        <label class="field">
+          <span class="label">Username</span>
+          <input name="username" type="text" placeholder="e.g. raghav" required />
+        </label>
+        <label class="field">
+          <span class="label">Password</span>
+          <input name="password" type="password" placeholder="••••••" required />
+        </label>
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" type="submit" id="login-btn">Sign in</button>
+      </div>
+      <div class="form-note">This demo login is ephemeral and only lasts for this session.</div>
+    </form>
+    <div id="login-error" class="alert hidden"></div>
+  </div>
+
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/login.js"></script>
+{% endblock %}

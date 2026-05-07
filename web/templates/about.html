@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-head">
+  <h1 class="page-title">About</h1>
+  <p class="page-subtitle">What this demo is doing under the hood.</p>
+</section>
+
+<section class="grid-2">
+  <div class="card prose">
+    <h2 class="card-title">Overview</h2>
+    <p>
+      This project combines a small neural network for numeric valuation with an optional LLM-generated explanation.
+      The goal is a simple, interview-friendly product demo: clean UX, fast feedback, and easy deployment.
+    </p>
+    <ul>
+      <li><strong>Price prediction:</strong> local Keras MLP downloaded from Hugging Face Hub.</li>
+      <li><strong>Explanation:</strong> optional request to the Hugging Face Inference API.</li>
+    </ul>
+  </div>
+
+  <div class="card prose">
+    <h2 class="card-title">How it works</h2>
+    <ol>
+      <li>User submits a vehicle profile.</li>
+      <li>The backend preprocesses the inputs to match the training pipeline.</li>
+      <li>The model predicts a log-price, converted back to GBP.</li>
+      <li>If enabled, an LLM returns 3–4 concise bullet points explaining major drivers.</li>
+    </ol>
+    <p class="muted">
+      Predictions are estimates and can be wrong; treat them as guidance.
+    </p>
+  </div>
+</section>
+{% endblock %}

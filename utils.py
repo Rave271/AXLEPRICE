@@ -112,15 +112,32 @@ def preprocess_single(
     car_dict: Dict[str, Any],
     feature_columns: List[str],
     scaler: StandardScaler,
+    numeric_idx: List[int] = None,
+    model_encoder: Dict[str, Any] = None,
+    reference_year: int = 2020,
 ) -> np.ndarray:
     """
     Preprocess a single car dictionary for prediction.
 
-    Converts the input dict to a dataframe, one-hot encodes it,
-    aligns to the training feature columns, scales, and returns
-    a numpy array ready for model.predict().
+    Handles smoothed target-encoding of 'model', feature engineering
+    (car_age, mileage_per_year), one-hot encoding of categoricals,
+    column alignment, and selective scaling of numeric columns only.
     """
-    df = pd.DataFrame([car_dict])
+    inp = car_dict.copy()
+
+    # Smoothed target-encode 'model' column
+    model_name = inp.pop("model", None)
+    if model_name is not None and model_encoder is not None:
+        model_map = model_encoder["model_target_map"]
+        inp["model_encoded"] = model_map.get(model_name, model_encoder["global_mean"])
+
+    # Feature engineering — must match training pipeline exactly
+    if "year" in inp:
+        car_age = reference_year - inp["year"]
+        inp["car_age"] = car_age
+        inp["mileage_per_year"] = inp.get("mileage", 0) / max(car_age, 1)
+
+    df = pd.DataFrame([inp])
 
     # One-hot encode categorical columns present in the input
     cols_to_encode = [c for c in CATEGORICAL_COLS if c in df.columns]
@@ -129,8 +146,14 @@ def preprocess_single(
     # Align to training columns
     df = df.reindex(columns=feature_columns, fill_value=0)
 
-    # Scale
-    X = scaler.transform(df.values)
+    X = df.values.copy()
+
+    # Scale only numeric columns (selective scaling matching training)
+    if numeric_idx is not None:
+        X[:, numeric_idx] = scaler.transform(X[:, numeric_idx])
+    else:
+        X = scaler.transform(X)
+
     return X
 
 

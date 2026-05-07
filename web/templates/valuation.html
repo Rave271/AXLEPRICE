@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-head">
+  <h1 class="page-title">Valuation</h1>
+  <p class="page-subtitle">Enter vehicle details and get an instant estimate.</p>
+</section>
+
+<section class="layout-two">
+  <div class="card">
+    <h2 class="card-title">Vehicle details</h2>
+
+    <form id="valuation-form" class="form" novalidate>
+      <div class="form-grid">
+        <label class="field">
+          <span class="label">Brand</span>
+          <input name="brand" type="text" placeholder="e.g. BMW" required />
+        </label>
+
+        <label class="field">
+          <span class="label">Model</span>
+          <input name="model" type="text" placeholder="e.g. 3 Series" required />
+        </label>
+
+        <label class="field">
+          <span class="label">Registration year</span>
+          <input name="year" type="number" min="1990" max="{{ current_year }}" placeholder="e.g. 2019" required />
+        </label>
+
+        <label class="field">
+          <span class="label">Mileage (miles)</span>
+          <input name="mileage" type="number" min="0" max="500000" step="1000" placeholder="e.g. 30000" required />
+        </label>
+
+        <label class="field">
+          <span class="label">Engine size (L)</span>
+          <input name="engineSize" type="number" min="0" max="8" step="0.1" placeholder="e.g. 2.0" required />
+        </label>
+
+        <label class="field">
+          <span class="label">Fuel type</span>
+          <select name="fuelType" required>
+            <option>Petrol</option>
+            <option>Diesel</option>
+            <option>Hybrid</option>
+            <option>Electric</option>
+            <option>Other</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span class="label">Transmission</span>
+          <select name="transmission" required>
+            <option>Automatic</option>
+            <option>Manual</option>
+            <option>Semi-Auto</option>
+          </select>
+        </label>
+      </div>
+
+      <details class="details">
+        <summary>Advanced (Hugging Face settings)</summary>
+        <div class="form-grid advanced">
+          <label class="field">
+            <span class="label">Repo ID</span>
+            <input name="repoId" type="text" value="{{ default_repo_id }}" />
+            <span class="help">Example: username/uk-used-car-nn</span>
+          </label>
+
+          <label class="field">
+            <span class="label">HF Token (optional)</span>
+            <input name="hfToken" type="password" placeholder="hf_..." />
+            <span class="help">Only needed for private repos or AI explanations.</span>
+          </label>
+
+          <label class="field checkbox">
+            <input name="explain" type="checkbox" checked />
+            <span class="label">Generate AI explanation</span>
+          </label>
+        </div>
+      </details>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="submit-btn" type="submit">Get valuation</button>
+        <button class="btn btn-ghost" id="example-btn" type="button">Use example</button>
+      </div>
+
+      <div class="form-note">
+        Prediction runs locally on the server. Explanations (if enabled) call the Hugging Face Inference API.
+      </div>
+    </form>
+  </div>
+
+  <div class="card" aria-live="polite">
+    <h2 class="card-title">Result</h2>
+
+    <div id="result-empty" class="empty-state">
+      Submit the form to see the predicted price.
+    </div>
+
+    <div id="result" class="result hidden">
+      <div class="metric">
+        <div class="metric-label">Predicted price</div>
+        <div class="metric-value" id="predicted-price">—</div>
+      </div>
+
+      <div class="metric">
+        <div class="metric-label">Confidence</div>
+        <div class="metric-value" id="confidence">—</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="result-actions">
+        <button class="btn btn-small" id="copy-btn" type="button">Copy result</button>
+        <span class="muted" id="saved-hint"></span>
+      </div>
+
+      <h3 class="subhead">AI explanation</h3>
+      <div id="explanation" class="prose muted">Enable “Generate AI explanation” to see details.</div>
+
+      <details class="details" id="input-summary-wrap">
+        <summary>Input summary</summary>
+        <pre id="input-summary" class="code">{}</pre>
+      </details>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="result-actions">
+      <h3 class="subhead">History</h3>
+      <button class="btn btn-small" id="export-csv" type="button">Export CSV</button>
+    </div>
+    <div id="history-empty" class="empty-state">No history available.</div>
+    <div id="history-list" class="history-list hidden"></div>
+
+    <div id="error" class="alert hidden"></div>
+    <div id="loading" class="loading hidden">
+      <div class="spinner" aria-hidden="true"></div>
+      <div>Working…</div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/valuation.js"></script>
+{% endblock %}
