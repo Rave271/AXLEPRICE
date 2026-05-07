@@ -9,4 +9,4 @@ pandas>=1.5
 scikit-learn>=1.2
 joblib>=1.2
 
-tensorflow>=2.13
+tensorflow==2.16.1
